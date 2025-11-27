@@ -11,4 +11,3 @@ class Light:
         self.yweight = y_weight
         self.xweight = x_weight
         return
-    testingg
