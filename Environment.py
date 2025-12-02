@@ -63,7 +63,7 @@ class Environment:
         # Flag to track if simulation should continue
         self.is_running = True
 
-    de step(self):
+    def step(self):
         """
         Advances the simulation by one timestep.
         Order of operations:
