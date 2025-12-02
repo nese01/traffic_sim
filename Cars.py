@@ -36,7 +36,7 @@ class Car:
         # Flag to track if this car has completed its journey
         self.completed = False
 
-    def step(self, TrafficLight, other_cars):
+    de step(self, TrafficLight, other_cars):
         """
         Called every timestep to update the car's state.
         Decides whether to move forward or wait based on conditions.
