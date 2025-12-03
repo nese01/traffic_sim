@@ -9,7 +9,7 @@ Three states: "RED", "YELLOW", and "GREEN"
 """
 
 class TrafficLight:
-    def __init__(self, x_pos, y_pos, weight, counterweight, init_state):
+    def __init__(self, x_pos, y_pos, weight=30, counterweight=30, init_state="RED", yellow_timer=2):
         self.xpos = x_pos
         self.ypos = y_pos
         self.timer = weight
@@ -17,47 +17,39 @@ class TrafficLight:
         self.state = init_state
         if init_state == "RED": self.current_time = counterweight
         else: self.current_time = weight
-        self.nsew = None
+        self.yellow_timer = yellow_timer
         self.priority = 0 #dummy code, will implement fully later
 
-
     """
-    Initialize location.
-    Sets the value so it can check for every
-    """
-    def initialize_location(self, lights_environment):
-        all_light_positions = lights_environment
-        np.where(lights_environment.has_light(lights_environment.get_pos - (3,0)), self.set_cardinal(0))
-        np.where(lights_environment.has_light(lights_environment.get_pos + (3, 0)), self.set_cardinal(1))
-        np.where(lights_environment.has_light(lights_environment.get_pos - (0, 3)), self.set_cardinal(2))
-        np.where(lights_environment.has_light(lights_environment.get_pos + (0, 3)), self.set_cardinal(3))
-    """
-    set cardinal
-    """
-    def set_cardinal(self, number):
-        self.nsew = number
-
-    """
-    Timer function, default mode
+    Step function, default mode
     Will decrement the timer it has on itself and switch states automatically
     Perfect for global independent function
     For advanced simulations, requires location and nearby traffic analysis with detect_car
     """
-    def global_timer(self):
-        self.current_time = self.current_time - 1
-        if self.state == "RED":
-            if self.current_time < 0:
-                self.state = "GREEN"
-                self.current_time = self.timer
+    def step(self, type=None):
+        match type:
+            case None: return "Error, please enter a type"
 
-        if self.state == "GREEN":
-            if self.current_time < 2:
-                self.state = "YELLOW"
+            case "time_cycle":
+                self.current_time = self.current_time - 1
+                if self.state == "RED":
+                    if self.current_time < 0:
+                        self.state = "GREEN"
+                        self.current_time = self.timer
 
-        elif self.state == "YELLOW":
-            if self.current_time < 0:
-                self.state = "RED"
-                self.current_time = self.red_timer
+                elif self.state == "GREEN":
+                    if self.current_time < 2:
+                        self.state = "YELLOW"
+
+                elif self.state == "YELLOW":
+                    if self.current_time < 0:
+                        self.state = "RED"
+                        self.current_time = self.red_timer
+            case "detection cycle":
+                return #implement later
+
+
+
 
     """
     Placeholder for potential additional mode
