@@ -1,7 +1,7 @@
 import numpy as np
 import random
 from Cars import Cars
-
+from TrafficLight import TrafficLight
 
 class Environment:
     """
@@ -9,7 +9,7 @@ class Environment:
     Simplified version with no lanes - just cars moving toward a traffic light.
     """
 
-    def __init__(self, traffic_light, grid_width=20, grid_height=20, spawn_rate=0.3,
+    def __init__(self, traffic_mode="time_cycle", grid_width=20, grid_height=20, spawn_rate=0.3,
                  max_cars=None, num_lanes=1, simulation_duration=None):
         """
         Initialize the simulation environment.
@@ -23,8 +23,13 @@ class Environment:
             num_lanes: Number of parallel lanes (1-3 recommended)
             simulation_duration: Max timesteps to run (None = unlimited)
         """
-        # Store the traffic light controlling this intersection
-        self.traffic_light = traffic_light
+        # List to store all the traffic lights
+        self.light_type = traffic_mode
+        self.west_traffic_lights = []
+        self.east_traffic_lights = []
+        self.north_traffic_lights = []
+        self.south_traffic_lights = []
+        self.initialize_more_lights()
 
         # Grid dimensions for the simulation space
         self.grid_width = grid_width
@@ -62,6 +67,20 @@ class Environment:
 
         # Flag to track if simulation should continue
         self.is_running = True
+
+        """
+        Initialize lights
+        Run at least once if adding multiple lanes. Focus on later
+        """
+    def initialize_more_lights(self):
+        ymiddle = int(self.grid_height/2)
+        xmiddle = int(self.grid_width/2)
+        yt = self.num_lanes*2
+        for i in range(self.num_lanes):
+            self.south_traffic_lights.append(TrafficLight(xmiddle+1+i, ymiddle-self.num_lanes, init_state="RED", yellow_timer= yt))
+            self.north_traffic_lights.append(TrafficLight(xmiddle-i, ymiddle+self.num_lanes+1, init_state="RED", yellow_timer= yt))
+            self.west_traffic_lights.append(TrafficLight(xmiddle-self.num_lanes, ymiddle-i, init_state="GREEN", yellow_timer = yt))
+            self.east_traffic_lights.append(TrafficLight(xmiddle+self.num_lanes+1, 1+i+ymiddle, init_state="GREEN", yellow_timer= yt))
 
     def step(self):
         """
