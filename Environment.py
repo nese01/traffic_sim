@@ -1,7 +1,7 @@
 import numpy as np
 import random
 from Cars import Cars
-from TrafficLight import TrafficLight
+from TrafficLight import TrafficLightSet
 
 class Environment:
     """
@@ -25,11 +25,8 @@ class Environment:
         """
         # List to store all the traffic lights
         self.light_type = traffic_mode
-        self.west_traffic_lights = []
-        self.east_traffic_lights = []
-        self.north_traffic_lights = []
-        self.south_traffic_lights = []
-        self.initialize_more_lights()
+        self.west_east_traffic_lights = []
+        self.north_south_traffic_lights = []
 
         # Grid dimensions for the simulation space
         self.grid_width = grid_width
@@ -54,6 +51,9 @@ class Environment:
         # More lanes = more throughput capacity
         self.num_lanes = num_lanes
 
+        #uses the number of lanes to store the light set
+        self.light_set = self.initialize_light_set()
+
         # Maximum simulation duration in timesteps (None = run indefinitely)
         # Useful for consistent comparison periods (e.g., 300 = 5 minutes)
         self.simulation_duration = simulation_duration
@@ -72,15 +72,29 @@ class Environment:
         Initialize lights
         Run at least once if adding multiple lanes. Focus on later
         """
-    def initialize_more_lights(self):
+    def initialize_light_set(self):
         ymiddle = int(self.grid_height/2)
         xmiddle = int(self.grid_width/2)
-        yt = self.num_lanes*2
+        positions = np.zeros((self.num_lanes*4,2), dtype='i')
         for i in range(self.num_lanes):
-            self.south_traffic_lights.append(TrafficLight(xmiddle+1+i, ymiddle-self.num_lanes, init_state="RED", yellow_timer= yt))
-            self.north_traffic_lights.append(TrafficLight(xmiddle-i, ymiddle+self.num_lanes+1, init_state="RED", yellow_timer= yt))
-            self.west_traffic_lights.append(TrafficLight(xmiddle-self.num_lanes, ymiddle-i, init_state="GREEN", yellow_timer = yt))
-            self.east_traffic_lights.append(TrafficLight(xmiddle+self.num_lanes+1, 1+i+ymiddle, init_state="GREEN", yellow_timer= yt))
+            #southern traffic light positions
+            positions[i] = xmiddle+1+i
+            positions[i,1] = ymiddle-self.num_lanes
+
+            #northern traffic light positions
+            positions[i+1] = xmiddle-i
+            positions[i+1, 1] = ymiddle+self.num_lanes+1
+
+            #western traffic light positions
+            positions[i+2, 0] = self.num_lanes, ymiddle-i
+            positions[i+2, 1] = ymiddle-i
+
+            #eastern traffic light positions
+            positions[i+3, 0] = self.num_lanes + 1
+            positions[i+3, 1] = ymiddle + i + 1
+
+        return TrafficLightSet(positions, lanes=self.num_lanes)
+
 
     def step(self):
         """
