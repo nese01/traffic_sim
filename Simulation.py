@@ -12,8 +12,8 @@ Main driver to visualize the data from our mini simulation
 """
 # ----------------------------------------------------
 # ---------------Initialized Variables----------------
-WIDTH = 30
-HEIGHT = 60
+WIDTH = 20
+HEIGHT = 20
 SIMULATION_UPTIME = 100
 Y_LANE_CHANCE = 0.4
 X_LANE_CHANCE = 0.1
@@ -30,15 +30,14 @@ def run_one_sim(type_sim="time_cycle", light_times = (45, 15), seconds = 40, ani
     print("Starting Simulation")
     data = env.Environment(type_sim, grid_width=WIDTH, grid_height=HEIGHT, spawn_rate=Y_LANE_CHANCE)
     if animate:
-        light_list = []
-        cat_positions = []
+        data_positions = []
         for i in range(seconds):
             data.step()
-            car_positions = data.get_grid_state()
-            light_list = data.get_light_grid()
+            data_positions.append(data.get_grid_state())
     else:
         for i in range(seconds):
             data.step()
+        data.get_average_idle_time()
 
     print("Ending Simulation")
     print("Average idle time = " + data.get_average_idle_time())
